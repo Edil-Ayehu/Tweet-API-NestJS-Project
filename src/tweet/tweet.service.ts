@@ -60,4 +60,13 @@ export class TweetService {
 
     return await this.tweetRepo.save(tweet)  // save method of the repository is used to either create new record in the table or to update existing record
   }
+
+  async deleteTweet(id:number) {
+    await this.tweetRepo.delete({id})
+
+    return {
+      id,
+      deleted: true,
+    }
+  }
 }
