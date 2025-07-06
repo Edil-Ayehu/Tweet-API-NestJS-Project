@@ -5,6 +5,7 @@ import { Tweet } from './tweet.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateTweetDto } from './dto/create-tweet.dto';
 import { HashtagService } from 'src/hashtag/hashtag.service';
+import { UpdateTweetDto } from './dto/update-tweet.dto';
 
 @Injectable()
 export class TweetService {
@@ -23,7 +24,7 @@ export class TweetService {
 
     return this.tweetRepo.find({
       where: { user: { id: userId } },
-      relations: { user: true },
+      relations: { user: true, hashtags: true },
     });
   }
 
@@ -44,5 +45,19 @@ export class TweetService {
     return await this.tweetRepo.save(newTweet);
   }
 
-  async updateTweet() {}
+  async updateTweet(updateTweetDto:UpdateTweetDto) {
+    // find all hashtags
+    let hashtags = await this.hashtagService.findHashtags(updateTweetDto.hashtags!)
+
+    // find the tweet by Id
+    let tweet = await this.tweetRepo.findOneBy({id: updateTweetDto.id})
+    if(!tweet) throw new NotFoundException('Tweet not found with the given Id')
+
+    // update properties of the tweet
+    tweet.text = updateTweetDto.text ?? tweet.text
+    tweet.image = updateTweetDto.image ?? tweet.image
+    tweet.hashtags = hashtags
+
+    return await this.tweetRepo.save(tweet)  // save method of the repository is used to either create new record in the table or to update existing record
+  }
 }
