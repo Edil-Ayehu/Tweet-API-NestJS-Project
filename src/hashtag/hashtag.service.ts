@@ -21,4 +21,16 @@ export class HashtagService {
             where: {id: In(hashtags)}
         })
     }
+
+    async deleteHashtag(id:number) {
+        await this.hashtagRepo.delete({id})
+
+        return {deleted: true, id}
+    }
+
+    async softDeleteHashtag(id:number) {
+        await this.hashtagRepo.softDelete({id})
+
+        return {softDeleted: true, id}
+    }
 }

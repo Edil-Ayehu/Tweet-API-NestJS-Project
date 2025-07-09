@@ -5,32 +5,44 @@ import { TweetModule } from './tweet/tweet.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './users/user.entity';
 import { ProfileModule } from './profile/profile.module';
 import { HashtagModule } from './hashtag/hashtag.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import appConfig from './config/app.config';
+import databaseConfig from './config/database.config';
+import envValidation from './config/env.validation';
+
+const ENV = process.env.NODE_ENV;
 
 @Module({
   imports: [
-    TweetModule, 
-    UsersModule, 
+    TweetModule,
+    UsersModule,
     AuthModule,
+    ConfigModule.forRoot({
+      isGlobal: true, // now the config module is avaible for all custom modules but not for thrid party module like TypeOrmModule
+      envFilePath: !ENV ? '.env' : `.env.${ENV}`,
+      load: [appConfig, databaseConfig],
+      validationSchema: envValidation
+    }),
     TypeOrmModule.forRootAsync({
-      useFactory: () => ({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        // entities: [User],
-        autoLoadEntities: true,
-        synchronize: true,
-        username: 'postgres',
-        database: 'nestjs2',
-        password: 'edilayehu',
-        port: 5432,
-        host: 'localhost'
-      })
+        autoLoadEntities: configService.get('database.autoLoadEntities'),
+        synchronize: configService.get('database.syncronize'),
+        username: configService.get('database.username'),
+        database: configService.get('database.name'),
+        password: configService.get('database.password'),
+        port: configService.get('database.port'),
+        host: configService.get('database.host'),
+      }),
     }),
     ProfileModule,
-    HashtagModule
+    HashtagModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {} 
+export class AppModule {}

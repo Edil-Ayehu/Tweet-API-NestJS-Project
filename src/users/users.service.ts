@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Profile } from 'src/profile/profile.entity';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {
@@ -14,9 +15,14 @@ export class UsersService {
 
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
+
+    private readonly configService: ConfigService
   ) {}
 
   getAllUsers() {
+    const environment = this.configService.get('ENV_MODe')
+    console.log(environment)
+
     return this.usersRepository.find({
       relations: {
         profile: true,
