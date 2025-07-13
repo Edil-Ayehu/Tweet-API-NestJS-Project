@@ -31,7 +31,7 @@ export class User {
   password: string;
 
   @OneToOne(() => Profile, (profile) => profile.user,{
-    cascade: ['insert']
+    cascade: ['insert'],
   })
   profile?: Profile
 

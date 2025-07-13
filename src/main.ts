@@ -8,6 +8,9 @@ async function bootstrap() {
     whitelist: true,  // this ignore any extra property from request body that doesn't found in the dto
     forbidNonWhitelisted: true,
     transform: true,
+    transformOptions: {
+      enableImplicitConversion: true,
+    }
   }))
   await app.listen(process.env.PORT ?? 3000);
 }

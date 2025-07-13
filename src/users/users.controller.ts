@@ -2,14 +2,15 @@ import {Body,Controller,DefaultValuePipe,Delete,Get,Param,ParseIntPipe,Patch,Pos
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dtos/create-user-dto';
 import { UpdateUserDto } from './dtos/update-user-dto';
+import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  getAllUsers() {
-    return this.usersService.getAllUsers();
+  getAllUsers(@Query() paginationQueryDto: PaginationQueryDto) {
+    return this.usersService.getAllUsers(paginationQueryDto);
   }
 
   @Get(':id')
